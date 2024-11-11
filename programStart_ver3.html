@@ -78,32 +78,48 @@
             const registryGuide = document.getElementById('registryGuide');
             
             try {
-                // 프로토콜 핸들러 지원 여부 확인
-                const supported = await navigator.registerProtocolHandler?.('web+dockerdesktop', '%s');
-                
                 // 실제 실행 시도
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 document.body.appendChild(iframe);
                 
                 let launched = false;
+                let hasError = false;
                 
-                iframe.onload = () => {
-                    launched = true;
-                    resultDiv.innerHTML = "<p class='success'>프로그램 실행 요청이 성공했습니다.</p>";
-                    registryGuide.style.display = 'none';
+                // 현재 시간 저장
+                const startTime = Date.now();
+                
+                // 포커스 이벤트 리스너 추가
+                const handleFocus = () => {
+                    // 프로그램이 실행되고 브라우저로 돌아온 경우
+                    if (Date.now() - startTime > 100) {  // 100ms 이상 지난 후 포커스가 돌아온 경우
+                        launched = true;
+                        if (!hasError) {
+                            resultDiv.innerHTML = "<p class='success'>프로그램 실행이 성공했습니다.</p>";
+                            registryGuide.style.display = 'none';
+                        }
+                    }
+                    window.removeEventListener('focus', handleFocus);
                 };
+                
+                window.addEventListener('focus', handleFocus);
 
+                // 에러 이벤트 리스너
                 iframe.onerror = () => {
+                    hasError = true;
                     showError();
                 };
 
                 // 5초 후에도 실행이 안 되면 에러로 처리
                 setTimeout(() => {
                     if (!launched) {
+                        hasError = true;
                         showError();
                     }
-                    document.body.removeChild(iframe);
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                    window.removeEventListener('focus', handleFocus);
                 }, 5000);
 
                 iframe.src = "docker-desktop://" + Date.now();
