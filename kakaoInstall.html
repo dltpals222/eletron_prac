@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>카카오톡 설치 확인</title>
+    <style>
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #FEE500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .info-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>카카오톡 설치 확인</h1>
+        
+        <div class="info-box">
+            <h3>버전 확인 방법</h3>
+            <ol>
+                <li>카카오톡 실행</li>
+                <li>설정 > 도움말 > 카카오톡 정보</li>
+            </ol>
+        </div>
+
+        <button class="button" onclick="checkKakaoTalk()">카카오톡 실행</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let timeoutId;
+
+        function checkKakaoTalk() {
+            const resultDiv = document.getElementById('result');
+            const beforeFocus = Date.now();
+            
+            // 카카오톡 실행 시도
+            window.location.href = "kakaoopen://";
+            
+            // 포커스 변화 감지
+            timeoutId = setTimeout(() => {
+                const afterFocus = Date.now();
+                
+                if (afterFocus - beforeFocus < 1000) {
+                    // 실행 실패로 판단
+                    resultDiv.innerHTML = "카카오톡이 설치되어 있지 않거나 실행할 수 없습니다.";
+                } else {
+                    resultDiv.innerHTML = "카카오톡이 실행되었습니다.";
+                }
+            }, 500);
+        }
+
+        // 페이지 벗어날 때 타이머 정리
+        window.onbeforeunload = function() {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    </script>
+</body>
+</html>

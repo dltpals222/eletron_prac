@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>프로그램 실행 테스트</title>
+    <style>
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .button { 
+            padding: 10px 20px; 
+            background-color: #007bff; 
+            color: white;
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 10px 0;
+        }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .info-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>프로그램 실행 테스트</h1>
+        
+        <div class="info-box">
+            <h3>프로그램 실행 상태 확인</h3>
+            <button class="button" onclick="checkProgram()">프로그램 실행 테스트</button>
+            <div id="result"></div>
+        </div>
+
+        <div id="registryGuide" style="display: none;">
+            <h3>레지스트리 등록 방법</h3>
+            <p>프로그램을 실행하기 위해 레지스트리 등록이 필요합니다.</p>
+            <button class="button" onclick="downloadRegistryFile()">레지스트리 파일 다운로드</button>
+            <div class="info-box">
+                <h4>설치 방법:</h4>
+                <ol>
+                    <li>위 버튼을 클릭하여 레지스트리 파일을 다운로드합니다.</li>
+                    <li>다운로드된 파일을 실행합니다.</li>
+                    <li>'예'를 클릭하여 레지스트리에 추가합니다.</li>
+                    <li>설치 완료 후 다시 프로그램 실행을 테스트해보세요.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timeoutId;
+
+        function checkProgram() {
+            const resultDiv = document.getElementById('result');
+            const registryGuide = document.getElementById('registryGuide');
+            const beforeFocus = Date.now();
+            
+            try {
+                // 프로그램 실행 시도
+                // window.location.href = "your-protocol://";
+                window.location.href = "docker-desktop://";
+                
+                // 포커스 변화 감지
+                timeoutId = setTimeout(() => {
+                    const afterFocus = Date.now();
+                    
+                    if (afterFocus - beforeFocus < 1000) {
+                        // 실행 실패로 판단
+                        resultDiv.innerHTML = "<p class='error'>프로그램을 실행할 수 없습니다.</p>";
+                        registryGuide.style.display = 'block';
+                    } else {
+                        resultDiv.innerHTML = "<p class='success'>프로그램이 실행되었습니다.</p>";
+                        registryGuide.style.display = 'none';
+                    }
+                }, 500);
+            } catch (e) {
+                resultDiv.innerHTML = "<p class='error'>프로그램 실행 중 오류가 발생했습니다.</p>";
+                registryGuide.style.display = 'block';
+            }
+        }
+
+        function downloadRegistryFile() {
+            const registryContent = `Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\docker-desktop]
+@="URL:Docker Desktop Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\docker-desktop\shell\open\command]
+@="\"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\" \"%1\""`
+            // const registryContent = `
+            // Windows Registry Editor Version 5.00
+
+            // [HKEY_CLASSES_ROOT\\your-protocol]
+            // @="URL:Your Program Protocol"
+            // "URL Protocol"=""
+
+            // [HKEY_CLASSES_ROOT\\your-protocol\\shell\\open\\command]
+            // @="\\"C:\\\\Program Files\\\\YourProgram\\\\Program.exe\\" \\"%1\\""
+            // `;
+
+            const blob = new Blob([registryContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'program-protocol.reg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        window.onbeforeunload = function() {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    </script>
+</body>
+</html>

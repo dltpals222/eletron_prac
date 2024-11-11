@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\docker-desktop]
+@="URL:Docker Desktop Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\docker-desktop\shell\open\command]
+@="\"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\" \"%1\""

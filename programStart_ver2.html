@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>프로그램 실행 테스트</title>
+    <style>
+        .container { 
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .button { 
+            padding: 10px 20px; 
+            background-color: #007bff; 
+            color: white;
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .error { 
+            color: #dc3545; 
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { 
+            color: #28a745;
+            padding: 10px;
+            background-color: #d4edda;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>프로그램 실행 테스트</h1>
+        
+        <div class="info-box">
+            <h3>프로그램 실행 상태 확인</h3>
+            <button class="button" onclick="checkProgram()">프로그램 실행 테스트</button>
+            <button class="button" onclick="location.reload(true)" style="background-color: #6c757d;">새로고침</button>
+            <div id="result"></div>
+        </div>
+
+        <div id="registryGuide" style="display: none;">
+            <h3>레지스트리 등록 방법</h3>
+            <p>프로그램을 실행하기 위해 레지스트리 등록이 필요합니다.</p>
+            <button class="button" onclick="downloadRegistryFile()">레지스트리 파일 다운로드</button>
+            <div class="info-box">
+                <h4>설치 방법:</h4>
+                <ol>
+                    <li>위 버튼을 클릭하여 레지스트리 파일을 다운로드합니다.</li>
+                    <li>다운로드된 파일을 실행합니다.</li>
+                    <li>'예'를 클릭하여 레지스트리에 추가합니다.</li>
+                    <li>브라우저를 새로고침한 후 다시 테스트해보세요.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkProgram() {
+            const resultDiv = document.getElementById('result');
+            const registryGuide = document.getElementById('registryGuide');
+            
+            try {
+                // 프로토콜 핸들러 지원 여부 확인
+                const supported = await navigator.registerProtocolHandler?.('web+dockerdesktop', '%s');
+                
+                // 실제 실행 시도
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                let launched = false;
+                
+                iframe.onload = () => {
+                    launched = true;
+                    resultDiv.innerHTML = "<p class='success'>프로그램 실행 요청이 성공했습니다.</p>";
+                    registryGuide.style.display = 'none';
+                };
+
+                iframe.onerror = () => {
+                    showError();
+                };
+
+                // 5초 후에도 실행이 안 되면 에러로 처리
+                setTimeout(() => {
+                    if (!launched) {
+                        showError();
+                    }
+                    document.body.removeChild(iframe);
+                }, 5000);
+
+                iframe.src = "docker-desktop://" + Date.now();
+
+            } catch (e) {
+                showError();
+            }
+
+            function showError() {
+                resultDiv.innerHTML = "<p class='error'>프로그램을 실행할 수 없습니다. Docker Desktop이 설치되어 있고 레지스트리가 등록되어 있는지 확인해주세요.</p>";
+                registryGuide.style.display = 'block';
+            }
+        }
+
+        function downloadRegistryFile() {
+            // Windows의 줄바꿈 문자(\r\n)를 사용하고 레지스트리 파일의 인코딩을 수정
+            const registryContent = 'Windows Registry Editor Version 5.00\r\n\r\n' +
+                '[HKEY_CLASSES_ROOT\\docker-desktop]\r\n' +
+                '@="URL:Docker Desktop Protocol"\r\n' +
+                '"URL Protocol"=""\r\n\r\n' +
+                '[HKEY_CLASSES_ROOT\\docker-desktop\\shell\\open\\command]\r\n' +
+                '@="\\"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\\" \\"%1\\""\r\n';
+
+            const blob = new Blob([registryContent], { type: 'application/x-registry-file' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'docker-desktop-protocol.reg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

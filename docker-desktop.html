@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Desktop Launch Test</title>
+</head>
+<body>
+    <h1>Docker Desktop 실행 테스트</h1>
+    
+    <!-- Docker Desktop URL 프로토콜 테스트 링크들 -->
+    <div style="margin: 20px">
+        <h3>테스트 링크:</h3>
+        <p><a href="docker-desktop://">Docker Desktop 실행</a></p>
+        <p><a href="docker-desktop://dashboard">대시보드 열기</a></p>
+        
+        <!-- JavaScript를 통한 실행 테스트 -->
+        <button onclick="launchDocker()">JavaScript로 Docker Desktop 실행</button>
+    </div>
+
+    <script>
+        function launchDocker() {
+            window.location.href = 'docker-desktop://';
+        }
+    </script>
+</body>
+</html>
