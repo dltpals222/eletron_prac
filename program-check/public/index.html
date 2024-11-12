@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>프로그램 버전 확인</title>
+</head>
+<body>
+    <h1>프로그램 버전 확인</h1>
+    <button onclick="checkProgram()">프로그램 확인</button>
+    <div id="result"></div>
+
+    <script>
+        async function checkProgram() {
+            const resultDiv = document.getElementById('result');
+            try {
+                const response = await fetch('/check-program');
+                const data = await response.json();
+                resultDiv.innerHTML = `<p>${data.program} 버전: ${data.version}</p>`;
+            } catch (error) {
+                resultDiv.innerHTML = '<p>프로그램 정보를 가져오는 중 오류가 발생했습니다.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

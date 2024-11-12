@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>프로그램 실행 테스트</title>
+    <style>
+        .container { 
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .button { 
+            padding: 10px 20px; 
+            background-color: #007bff; 
+            color: white;
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .error { 
+            color: #dc3545; 
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { 
+            color: #28a745;
+            padding: 10px;
+            background-color: #d4edda;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>프로그램 실행 테스트</h1>
+        
+        <div class="info-box">
+            <h3>프로그램 실행 상태 확인</h3>
+            <button class="button" onclick="checkProgram()">프로그램 실행 테스트</button>
+            <button class="button" onclick="location.reload(true)" style="background-color: #6c757d;">새로고침</button>
+            <div id="result"></div>
+        </div>
+
+        <div id="registryGuide" style="display: none;">
+            <h3>레지스트리 등록 및 설치 방법</h3>
+            <p>프로그램을 실행하기 위해 레지스트리 등록과 설치가 필요합니다.</p>
+            <button class="button" onclick="downloadRegistryFile()">레지스트리 파일 다운로드</button>
+            <button class="button" onclick="downloadInstallerFile()">설치 파일 다운로드</button>
+            <div class="info-box">
+                <h4>설치 및 등록 방법:</h4>
+                <ol>
+                    <li><strong>레지스트리 파일 다운로드</strong> 버튼을 클릭하여 <strong>레지스트리 파일</strong>을 다운로드합니다.</li>
+                    <li>다운로드된 레지스트리 파일을 실행하여 '예'를 클릭하여 레지스트리에 추가합니다.</li>
+                    <li><strong>설치 파일 다운로드</strong> 버튼을 클릭하여 <strong>설치 파일</strong>을 다운로드합니다.</li>
+                    <li>다운로드된 설치 파일을 실행하여 프로그램을 설치합니다.</li>
+                    <li>브라우저를 새로고침한 후 프로그램 실행 테스트를 다시 시도해보세요.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkProgram() {
+            const resultDiv = document.getElementById('result');
+            const registryGuide = document.getElementById('registryGuide');
+            
+            try {
+                const response = await fetch('/check-program');
+                const data = await response.json();
+                
+                if (data.version !== 'Not Installed') {
+                    resultDiv.innerHTML = `<p class='success'>프로그램이 설치되어 있습니다: 버전 ${data.version}</p>`;
+                    registryGuide.style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `<p class='error'>프로그램이 설치되어 있지 않습니다.</p>`;
+                    registryGuide.style.display = 'block';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class='error'>프로그램 정보를 확인하는 중 오류가 발생했습니다.</p>`;
+                registryGuide.style.display = 'block';
+            }
+        }
+
+        function downloadRegistryFile() {
+            const registryContent = 'Windows Registry Editor Version 5.00\r\n\r\n' +
+                '[HKEY_CLASSES_ROOT\\electron-app]\r\n' +
+                '@="URL:electron-app Protocol"\r\n' +
+                '"URL Protocol"=""\r\n' +
+                '"Version"="2.0"\r\n\r\n' +
+                '[HKEY_CLASSES_ROOT\\electron-app\\shell\\open\\command]\r\n' +
+                '@="\\"C:\\\\Program Files\\\\electron-app\\\\electron-app.exe\\" \\"%1\\""\r\n';
+
+            const blob = new Blob([registryContent], { type: 'application/x-registry-file' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'electron-app-protocol.reg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function downloadInstallerFile() {
+            const a = document.createElement('a');
+            a.href = './electron-app Setup 1.0.0.exe'; // 설치 파일의 경로
+            a.download = 'electron-app Setup 1.0.0.exe';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
