@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>프로그램 실행 테스트</title>
+    <title>프로그램 실행 테스트 v4</title>
     <style>
         .container { 
             padding: 20px; 
@@ -48,6 +48,7 @@
 <body>
     <div class="container">
         <h1>프로그램 실행 테스트</h1>
+        <!-- electron app 실행 -->
         
         <div class="info-box">
             <h3>프로그램 실행 상태 확인</h3>
@@ -141,7 +142,7 @@
             '"URL Protocol"=""\r\n' +
             '"Version"="2.0"\r\n\r\n' +  // 버전 정보 추가
             '[HKEY_CLASSES_ROOT\\electron-app\\shell\\open\\command]\r\n' +
-            '@="\\"C:\\\\Users\\\\lw\\\\Downloads\\\\testElectron\\\\electron\\\\release\\\\my-electron-app-win32-x64\\\\electron-app.exe\\" \\"%1\\""\r\n';
+            '@="\\"C:\\\\Program Files\\\\electron-app\\\\electron-app.exe\\" \\"%1\\""\r\n';
 
             const blob = new Blob([registryContent], { type: 'application/x-registry-file' });
             const url = window.URL.createObjectURL(blob);

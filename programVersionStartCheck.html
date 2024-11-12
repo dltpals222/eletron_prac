@@ -83,13 +83,13 @@
         const RESPONSE_TIMEOUT = 5000;
 
         function downloadRegistryFile() {
-          const registryContent = 'Windows Registry Editor Version 5.00\r\n\r\n' +
+            const registryContent = 'Windows Registry Editor Version 5.00\r\n\r\n' +
             '[HKEY_CLASSES_ROOT\\electron-app]\r\n' +
             '@="URL:electron-app Protocol"\r\n' +
             '"URL Protocol"=""\r\n' +
             '"Version"="2.0"\r\n\r\n' +  // 버전 정보 추가
             '[HKEY_CLASSES_ROOT\\electron-app\\shell\\open\\command]\r\n' +
-            '@="\\"C:\\\\Users\\\\lw\\\\Downloads\\\\testElectron\\\\electron\\\\release\\\\my-electron-app-win32-x64\\\\electron-app.exe\\" \\"%1\\""\r\n';
+            '@="\\"C:\\\\Program Files\\\\electron-app\\\\electron-app.exe\\" \\"%1\\""\r\n';
 
             const blob = new Blob([registryContent], { type: 'application/x-registry-file' });
             const url = window.URL.createObjectURL(blob);
