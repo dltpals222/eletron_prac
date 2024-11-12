@@ -1,0 +1,44 @@
+{
+  "name": "your-app-name",
+  "version": "1.0.0",
+  "description": "Your app description",
+  "author": "blahblah",
+  "main": "main.js",
+  "build": {
+    "appId": "com.yourapp.id",
+    "productName": "electron-app",
+    "files": [
+      "main.js",
+      "index.html",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "sign": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "scripts": {
+    "dist": "electron-builder --win --x64",
+    "start": "electron .",
+    "package": "electron-packager . my-electron-app --platform=win32,linux,mas --arch=x64 --out=release --overwrite"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "winreg": "^1.2.5"
+  }
+}
