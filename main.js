@@ -6,7 +6,7 @@ const app = express();
 const PORT = 3000;
 
 // 정적 파일 서빙 설정
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'allVer')));
 
 app.get('/check-program', (req, res) => {
     const programName = 'electron-app'; // 찾고자 하는 프로그램 이름
