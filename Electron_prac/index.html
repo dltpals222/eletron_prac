@@ -2,10 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hello World!</title>
+  <title>Version Checker</title>
+  <script>
+    async function fetchVersionInfo() {
+      try {
+        // 현재 설치된 버전 가져오기
+        const programResponse = await fetch('http://localhost:3000/check-program');
+        const programData = await programResponse.json();
+        const currentVersion = programData.version;
+
+        // 최신 버전 가져오기
+        const latestResponse = await fetch('http://localhost:3000/latest-version');
+        const latestData = await latestResponse.json();
+        const latestVersion = latestData.version;
+
+        // HTML에 버전 정보 표시
+        document.getElementById('current-version').textContent = `Current Version: ${currentVersion}`;
+        document.getElementById('latest-version').textContent = `Latest Version: ${latestVersion}`;
+      } catch (error) {
+        console.error('Error fetching version info:', error);
+      }
+    }
+
+    // 페이지 로드 시 버전 정보 가져오기
+    window.onload = fetchVersionInfo;
+  </script>
 </head>
 <body>
-  <h1>Hello World!</h1>
-  <p>This is a basic Electron app.</p>
+  <h1>Version Checker</h1>
+  <p id="current-version">Current Version: Loading...</p>
+  <p id="latest-version">Latest Version: Loading...</p>
 </body>
 </html>

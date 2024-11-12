@@ -8,11 +8,16 @@ const PORT = 3000;
 // 정적 파일 서빙 설정
 app.use(express.static(path.join(__dirname, 'allVer')));
 
+// 최신 버전 정보를 제공하는 엔드포인트
+app.get('/latest-version', (req, res) => {
+    // 최신 버전 정보를 JSON 형식으로 반환
+    res.json({ version: '1.0.1' });
+});
+
 app.get('/check-program', (req, res) => {
     const programName = 'electron-app'; // 찾고자 하는 프로그램 이름
 
     // 64비트 레지스트리에서 정보 가져오기
-    // exec(`powershell -Command "${psCommand64}"`, (error64, stdout64, stderr64) => {
     exec(`powershell -Command "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName, DisplayVersion"`, (error64, stdout64, stderr64) => {
         if (error64) {
             return res.status(500).send('Error retrieving program list from 64-bit registry');
