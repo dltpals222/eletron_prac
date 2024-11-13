@@ -1,4 +1,5 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 const axios = require('axios');
 
 function createWindow() {
@@ -6,8 +7,9 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+            preload: path.join(__dirname, 'preload.js'), // preload.js 경로 설정
+            contextIsolation: true,
+            enableRemoteModule: false,
         },
     });
 
@@ -18,20 +20,17 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
+ipcMain.handle('get-version', async () => {
+    return app.getVersion();
+});
+
 async function checkForUpdates() {
     try {
-        const response = await axios.get('http://localhost:3000/latest-version');
-        const latestVersion = response.data.version;
         const currentVersion = app.getVersion();
-
-        if (currentVersion !== latestVersion) {
-            dialog.showMessageBox({
-                type: 'info',
-                buttons: ['OK'],
-                title: 'Update Available',
-                message: `A new version (${latestVersion}) is available. Please update your app.`,
-            });
-        }
+        const response = await axios.get(`http://localhost:3000/check-version?version=${currentVersion}`);
+        
+        console.log(`Current Version: ${currentVersion}`);
+        console.log(`Latest Version: ${response.data.latestVersion}`);
     } catch (error) {
         console.error('Failed to check for updates:', error);
     }
